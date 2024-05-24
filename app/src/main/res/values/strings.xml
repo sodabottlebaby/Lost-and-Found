@@ -1,0 +1,34 @@
+<resources>
+    <string name="app_name">Lost&amp;Found</string>
+    <string name="show_all_items">Show all items</string>
+    <string name="create_new_advert">Create new advert</string>
+    <string name="show_all_lost_found_items"><![CDATA[Show all lost & found items]]></string>
+    <string name="create_a_new_advert">Create a new advert</string>
+    <string name="date">Date:</string>
+    <string name="location">Location:</string>
+    <string name="save">Save</string>
+    <string name="description">Description:</string>
+    <string name="phone">Phone:</string>
+    <string name="found">Found</string>
+    <string name="lost">Lost</string>
+    <string name="post_type">Post type:</string>
+    <string name="create_an_advert">Create an advert</string>
+    <string name="name">Name:</string>
+    <string name="your_name">Your name</string>
+    <string name="location_hint">Where did you lose/find this item?</string>
+    <string name="description_hint">Add more details about your item</string>
+    <string name="phone_hint">Contact number</string>
+    <string name="lost_and_found_items"><![CDATA[LOST & FOUND ITEMS]]></string>
+    <string name="item_name">Item name\n</string>
+    <string name="delete_ad">Delete Ad</string>
+    <string name="deakin_university">Deakin University</string>
+    <string name="_2024_05_14">2024-05-14</string>
+    <string name="item_description">Item description</string>
+    <string name="_0410821524">0410821524</string>
+    <string name="item_name2">Item Name</string>
+    <string name="lost_found">Lost/Found</string>
+    <string name="lost_amp_found_details"><![CDATA[Lost & found Details]]></string>
+    <string name="show_on_map">Show on map</string>
+    <string name="google_maps_key">AIzaSyA0nI6bvOHbrcvPcXUlUY-XE6x6HlpYkp4</string>
+    <string name="get_current_location">Get Current Location</string>
+</resources>
