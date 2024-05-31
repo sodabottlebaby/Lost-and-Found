@@ -75,33 +75,28 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public List<ItemsPreview> getAllItems() {
         List<ItemsPreview> itemsList = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT " + COLUMN_ID + ", " + COLUMN_TYPE + ", " + COLUMN_NAME + " FROM " + TABLE_ITEMS, null);
-
-        int idIndex = cursor.getColumnIndex(COLUMN_ID);
-        int typeIndex = cursor.getColumnIndex(COLUMN_TYPE);
-        int nameIndex = cursor.getColumnIndex(COLUMN_NAME);
-
-        if (idIndex == -1 || typeIndex == -1 || nameIndex == -1) {
-            Log.e("DatabaseHelper", "One of the columns is missing in the database.");
-            cursor.close();
-            db.close();
-            return itemsList;  // Return an empty list if any column index is -1
-        }
+        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_ITEMS, null);
 
         if (cursor.moveToFirst()) {
             do {
                 int id = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ID));
                 String advertType = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_TYPE));
                 String name = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME));
-                ItemsPreview item = new ItemsPreview(id, advertType + ": " + name);
+                double latitude = cursor.getDouble(cursor.getColumnIndexOrThrow(COLUMN_LATITUDE));
+                double longitude = cursor.getDouble(cursor.getColumnIndexOrThrow(COLUMN_LONGITUDE));
+                String location = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_LOCATION));
+                ItemsPreview item = new ItemsPreview(id, advertType, name, latitude, longitude, location);
                 itemsList.add(item);
             } while (cursor.moveToNext());
+        } else {
+            Log.e("DatabaseHelper", "No data found in database.");
         }
 
         cursor.close();
         db.close();
         return itemsList;
     }
+
 
     public LostFoundItems getItemById(int id) {
         SQLiteDatabase db = this.getReadableDatabase();

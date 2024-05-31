@@ -1,5 +1,6 @@
 package com.example.lostfound;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -57,6 +58,11 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         mMap = googleMap;
+
+        // Enable zoom controls and gestures
+        mMap.getUiSettings().setZoomControlsEnabled(true);
+        mMap.getUiSettings().setZoomGesturesEnabled(true);
+        mMap.getUiSettings().setScrollGesturesEnabled(true);
 
         if (items != null) {
             for (ItemsPreview item : items) {
@@ -143,7 +149,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
 
         @Override
         public View getInfoContents(@NonNull Marker marker) {
-            View view = getLayoutInflater().inflate(R.layout.custom_info_window, null);
+            @SuppressLint("InflateParams") View view = getLayoutInflater().inflate(R.layout.custom_info_window, null);
             TextView type = view.findViewById(R.id.type);
             TextView snippet = view.findViewById(R.id.snippet);
             TextView name = view.findViewById(R.id.name);

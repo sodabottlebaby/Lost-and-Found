@@ -1,21 +1,27 @@
 package com.example.lostfound;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.List;
 
 public class GeocodingResponse {
     public List<Result> results;
 
     public static class Result {
-        public Geometry geometry;
+        @SerializedName("formatted_address")
         public String formattedAddress;
 
-        public static class Geometry {
-            public Location location;
+        @SerializedName("geometry")
+        public Geometry geometry;
+    }
 
-            public static class Location {
-                public double lat;
-                public double lng;
-            }
-        }
+    public static class Geometry {
+        @SerializedName("location")
+        public Location location;
+    }
+
+    public static class Location {
+        public double lat;
+        public double lng;
     }
 }

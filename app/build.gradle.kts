@@ -24,12 +24,6 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            signingConfig = signingConfigs.create("release").apply {
-                keyAlias = "sodabottlebaby"
-                keyPassword = "android"
-                storeFile = file("~/Downloads/SIT708_7.1P-main/Gradle Scripts/keystore.jks")
-                storePassword = "your-store-password"
-            }
         }
     }
     compileOptions {

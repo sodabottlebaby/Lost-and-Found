@@ -1,20 +1,15 @@
 package com.example.lostfound;
 
 import android.Manifest;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.DatePicker;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -24,6 +19,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.libraries.places.api.Places;
@@ -37,6 +33,12 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class AddActivity extends AppCompatActivity {
 
@@ -97,7 +99,8 @@ public class AddActivity extends AppCompatActivity {
 
     @SuppressLint("MissingPermission")
     private void getCurrentLocation() {
-        fusedLocationClient.getLastLocation()
+        Log.d(TAG, "Getting current location...");
+        fusedLocationClient.getCurrentLocation(LocationRequest.PRIORITY_HIGH_ACCURACY, null)
                 .addOnSuccessListener(this, location -> {
                     if (location != null) {
                         latitude = location.getLatitude();
@@ -105,6 +108,7 @@ public class AddActivity extends AppCompatActivity {
                         Log.d(TAG, "Current location: " + latitude + ", " + longitude);
                         useGoogleGeocodingAPI(latitude, longitude);
                     } else {
+                        Log.d(TAG, "Location is null");
                         Toast.makeText(this, "Unable to get current location", Toast.LENGTH_SHORT).show();
                     }
                 })
@@ -116,6 +120,7 @@ public class AddActivity extends AppCompatActivity {
 
     private void useGoogleGeocodingAPI(double latitude, double longitude) {
         String latlng = latitude + "," + longitude;
+        Log.d(TAG, "Calling Geocoding API for latlng: " + latlng);
         Call<GeocodingResponse> call = geocodingService.getGeocodingResult(latlng, getString(R.string.google_maps_key));
         call.enqueue(new Callback<GeocodingResponse>() {
             @SuppressLint("SetTextI18n")
@@ -123,36 +128,60 @@ public class AddActivity extends AppCompatActivity {
             public void onResponse(@NonNull Call<GeocodingResponse> call, @NonNull Response<GeocodingResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     List<GeocodingResponse.Result> results = response.body().results;
-                    Log.d(TAG, "Geocoding results: " + results.toString()); // Log the results
+                    Log.d(TAG, "Geocoding results: " + results.toString());
                     if (!results.isEmpty()) {
                         String address = results.get(0).formattedAddress;
-                        runOnUiThread(() -> locationEditText.setText(address));
+                        Log.d(TAG, "First address in results: " + address);
+                        for (GeocodingResponse.Result result : results) {
+                            Log.d(TAG, "Address: " + result.formattedAddress + ", Location: " + result.geometry.location.lat + ", " + result.geometry.location.lng);
+                        }
+                        if (address != null) {
+                            runOnUiThread(() -> updateLocationTextBox(address));
+                        } else {
+                            Log.d(TAG, "Formatted address is null");
+                            runOnUiThread(() -> {
+                                Toast.makeText(AddActivity.this, "Unable to get address for the location", Toast.LENGTH_SHORT).show();
+                                locationEditText.setText("Unable to get address for the location");
+                            });
+                        }
                     } else {
-                        Log.e(TAG, "Geocoding results are empty!");
+                        Log.d(TAG, "Geocoding results are empty");
                         runOnUiThread(() -> {
                             Toast.makeText(AddActivity.this, "Unable to get address for the location", Toast.LENGTH_SHORT).show();
                             locationEditText.setText("Unable to get address for the location");
                         });
                     }
                 } else {
-                    Log.e(TAG, "Failed to get address: " + response.errorBody().toString());
-                    runOnUiThread(() -> {
-                        Toast.makeText(AddActivity.this, "Failed to get address", Toast.LENGTH_SHORT).show();
-                        locationEditText.setText("Failed to get address");
-                    });
+                    try {
+                        String errorBody = response.errorBody().string();
+                        Log.d(TAG, "Failed to get address: " + errorBody);
+                        // Log the raw JSON response for further analysis
+                        Log.d(TAG, "Raw JSON response: " + response.raw().toString());
+                        runOnUiThread(() -> {
+                            Toast.makeText(AddActivity.this, "Failed to get address", Toast.LENGTH_SHORT).show();
+                            locationEditText.setText("Failed to get address");
+                        });
+                    } catch (Exception e) {
+                        Log.e(TAG, "Error parsing error body", e);
+                    }
                 }
             }
 
             @SuppressLint("SetTextI18n")
             @Override
             public void onFailure(@NonNull Call<GeocodingResponse> call, @NonNull Throwable t) {
-                Log.e(TAG, "Geocoding API failure: " + t.getMessage(), t);
+                Log.d(TAG, "Geocoding API failure: " + t.getMessage(), t);
                 runOnUiThread(() -> {
                     Toast.makeText(AddActivity.this, "Error getting address: " + t.getMessage(), Toast.LENGTH_SHORT).show();
                     locationEditText.setText("Error getting address");
                 });
             }
         });
+    }
+
+    private void updateLocationTextBox(String address) {
+        Log.d(TAG, "Updating location text box with address: " + address);
+        runOnUiThread(() -> locationEditText.setText(address));
     }
 
     private void startAutocompleteActivity() {
@@ -217,8 +246,10 @@ public class AddActivity extends AppCompatActivity {
     }
 
     private boolean checkLocationPermission() {
-        return ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
+        boolean granted = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
                 ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+        Log.d(TAG, "Location permission granted: " + granted);
+        return granted;
     }
 
     private void requestLocationPermission() {

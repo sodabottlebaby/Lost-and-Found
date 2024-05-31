@@ -18,9 +18,6 @@ public class ItemsPreview {
         this.location = location;
     }
 
-    public ItemsPreview(int id, String advertType) {
-    }
-
     // Getters
     public int getId() {
         return id;
@@ -35,11 +32,11 @@ public class ItemsPreview {
     }
 
     public double getLatitude() {
-        return latitude; // Added getter for latitude
+        return latitude;
     }
 
     public double getLongitude() {
-        return longitude; // Added getter for longitude
+        return longitude;
     }
 
     public String getLocation() {
@@ -50,9 +47,8 @@ public class ItemsPreview {
     public void setLatitude(double latitude) {
         this.latitude = latitude;
     }
+
     public void setLongitude(double longitude) {
         this.longitude = longitude;
     }
-
-
 }

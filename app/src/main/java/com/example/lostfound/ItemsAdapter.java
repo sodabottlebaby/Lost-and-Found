@@ -37,8 +37,7 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ItemViewHold
     @Override
     public void onBindViewHolder(@NonNull ItemViewHolder holder, int position) {
         ItemsPreview item = itemList.get(position);
-        holder.nameTextView.setText(item.getName());
-        holder.typeTextView.setText(item.getAdvertType());
+        holder.nameTypeTextView.setText(item.getAdvertType() + ": " + item.getName());
     }
 
     @Override
@@ -48,13 +47,11 @@ public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ItemViewHold
 
     public static class ItemViewHolder extends RecyclerView.ViewHolder {
 
-        public TextView nameTextView;
-        public TextView typeTextView;
+        public TextView nameTypeTextView;
 
         public ItemViewHolder(@NonNull View itemView, final OnItemClickListener listener) {
             super(itemView);
-            nameTextView = itemView.findViewById(R.id.nameTextView);
-            typeTextView = itemView.findViewById(R.id.typeTextView);
+            nameTypeTextView = itemView.findViewById(R.id.nameTypeTextView);
 
             itemView.setOnClickListener(v -> {
                 if (listener != null) {
